@@ -18,5 +18,11 @@ def add_patient(patient_name):
     queue.append(patient_name)
     return f"Patient {patient_name} added! Current queue length: {len(queue)}"
 
+@app.route('/queue')
+def view_queue():
+    if not queue:
+        return "The queue is currently empty."
+    return "<br>".join([f"{i+1}. {name}" for i, name in enumerate(queue)])
+    
 if __name__ == '__main__':
     app.run(debug=True)
