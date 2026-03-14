@@ -8,13 +8,15 @@ queue = []
 # Counter for total patients served
 total_served = 0
 
-# Homepage showing queue + total served + add/remove options
+# Homepage showing queue + next patient + total served + add/remove/reset options
 @app.route('/')
 def home():
     queue_list = "<br>".join([f"{i+1}. {name} <a href='/remove/{name}'>Remove</a>"
                               for i, name in enumerate(queue)])
+    next_patient = queue[0] if queue else "No patients in queue"
     return render_template_string("""
         <h1>Welcome to the Clinic Queue System</h1>
+        <h2>Next Patient: {{ next_patient }}</h2>
         <h2>Current Queue:</h2>
         <p>{{ queue_list|safe }}</p>
         <h3>Add Patient:</h3>
@@ -27,7 +29,7 @@ def home():
         <form action="/reset" method="post">
             <input type="submit" value="Reset Queue">
         </form>
-    """, queue_list=queue_list, total_served=total_served)
+    """, queue_list=queue_list, total_served=total_served, next_patient=next_patient)
 
 # Add patient via URL
 @app.route('/add/<patient_name>')
