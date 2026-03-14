@@ -87,7 +87,6 @@ def home():
             sort_queue()
             message = "Queue sorted"
 
-    # Prepare data for template
     queue_list = ", ".join(queue) if queue else "No patients waiting"
     next_patient_name = queue[0] if queue else "No patients waiting"
     avg_wait_str = f"{average_wait():.2f}"
@@ -100,12 +99,13 @@ def home():
                 body {
                     background-color: #1c1c1e;
                     color: #ffffff;
-                    /* Push 19: refined Apple-style font */
                     font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
                     margin: 20px;
+                    text-align: center; /* Push 20: Center everything */
                 }
                 h1, h2, h3 {
                     color: #f5f5f7;
+                    margin-bottom: 10px;
                 }
                 input[type=text] {
                     padding: 8px;
