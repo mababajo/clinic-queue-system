@@ -8,7 +8,7 @@ queue = []
 # Counter for total patients served
 total_served = 0
 
-# Homepage showing queue + next patient + total served + add/remove/reset options
+# Homepage showing queue + next patient + total served + add/remove/reset/search
 @app.route('/')
 def home():
     queue_list = "<br>".join([f"{i+1}. {name} <a href='/remove/{name}'>Remove</a>"
@@ -19,12 +19,21 @@ def home():
         <h2>Next Patient: {{ next_patient }}</h2>
         <h2>Current Queue:</h2>
         <p>{{ queue_list|safe }}</p>
+
         <h3>Add Patient:</h3>
         <form action="/add_form" method="post">
             <input type="text" name="patient_name" placeholder="Patient Name" required>
             <input type="submit" value="Add">
         </form>
+
+        <h3>Search Patient:</h3>
+        <form action="/search_form" method="post">
+            <input type="text" name="patient_name" placeholder="Patient Name" required>
+            <input type="submit" value="Search">
+        </form>
+
         <h3>Total Patients Served: {{ total_served }}</h3>
+
         <h3>Reset Queue:</h3>
         <form action="/reset" method="post">
             <input type="submit" value="Reset Queue">
@@ -68,6 +77,15 @@ def reset_queue():
     queue = []
     total_served = 0
     return redirect('/')
+
+# Search for a patient via form
+@app.route('/search_form', methods=['POST'])
+def search_form():
+    patient_name = request.form['patient_name']
+    if patient_name in queue:
+        position = queue.index(patient_name) + 1
+        return f"Patient {patient_name} is in the queue at position {position}."
+    return f"Patient {patient_name} is not in the queue."
 
 if __name__ == '__main__':
     app.run(debug=True)
