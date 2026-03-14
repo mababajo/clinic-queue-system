@@ -9,7 +9,7 @@ served_history = []
 # Counter for total patients served
 total_served = 0
 
-# Homepage showing queue + next patient + total served + add/remove/reset/search/sort/export/served history
+# Homepage showing queue + next patient + total served + add/remove/reset/search/sort/export/served history/priority
 @app.route('/')
 def home():
     queue_list = "<br>".join([f"{i+1}. {name} <a href='/remove/{name}'>Remove</a>"
@@ -26,6 +26,12 @@ def home():
         <form action="/add_form" method="post">
             <input type="text" name="patient_name" placeholder="Patient Name" required>
             <input type="submit" value="Add">
+        </form>
+
+        <h3>Add Urgent Patient (Front of Queue):</h3>
+        <form action="/add_urgent_form" method="post">
+            <input type="text" name="patient_name" placeholder="Patient Name" required>
+            <input type="submit" value="Add Urgent">
         </form>
 
         <h3>Search Patient:</h3>
@@ -66,6 +72,13 @@ def add_patient(patient_name):
 def add_form():
     patient_name = request.form['patient_name']
     queue.append(patient_name)
+    return redirect('/')
+
+# Add urgent patient to the front of the queue via form
+@app.route('/add_urgent_form', methods=['POST'])
+def add_urgent_form():
+    patient_name = request.form['patient_name']
+    queue.insert(0, patient_name)
     return redirect('/')
 
 # Remove patient and mark as served
