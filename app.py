@@ -23,6 +23,10 @@ def home():
             <input type="submit" value="Add">
         </form>
         <h3>Total Patients Served: {{ total_served }}</h3>
+        <h3>Reset Queue:</h3>
+        <form action="/reset" method="post">
+            <input type="submit" value="Reset Queue">
+        </form>
     """, queue_list=queue_list, total_served=total_served)
 
 # Add patient via URL
@@ -48,12 +52,20 @@ def remove_patient(patient_name):
         return f"Patient {patient_name} removed! Current queue length: {len(queue)}"
     return f"Patient {patient_name} not found in the queue."
 
-# View full queue (optional, still works)
+# View full queue
 @app.route('/queue')
 def view_queue():
     if not queue:
         return "The queue is currently empty."
     return "<br>".join([f"{i+1}. {name}" for i, name in enumerate(queue)])
+
+# Reset the queue
+@app.route('/reset', methods=['POST'])
+def reset_queue():
+    global queue, total_served
+    queue = []
+    total_served = 0
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run(debug=True)
