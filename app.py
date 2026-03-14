@@ -5,7 +5,10 @@ app = Flask(__name__)
 # List to hold patients
 queue = []
 
-# Homepage showing queue + add/remove options
+# Counter for total patients served
+total_served = 0
+
+# Homepage showing queue + total served + add/remove options
 @app.route('/')
 def home():
     queue_list = "<br>".join([f"{i+1}. {name} <a href='/remove/{name}'>Remove</a>"
@@ -19,7 +22,8 @@ def home():
             <input type="text" name="patient_name" placeholder="Patient Name" required>
             <input type="submit" value="Add">
         </form>
-    """, queue_list=queue_list)
+        <h3>Total Patients Served: {{ total_served }}</h3>
+    """, queue_list=queue_list, total_served=total_served)
 
 # Add patient via URL
 @app.route('/add/<patient_name>')
@@ -37,8 +41,10 @@ def add_form():
 # Remove patient
 @app.route('/remove/<patient_name>')
 def remove_patient(patient_name):
+    global total_served
     if patient_name in queue:
         queue.remove(patient_name)
+        total_served += 1
         return f"Patient {patient_name} removed! Current queue length: {len(queue)}"
     return f"Patient {patient_name} not found in the queue."
 
@@ -50,5 +56,4 @@ def view_queue():
     return "<br>".join([f"{i+1}. {name}" for i, name in enumerate(queue)])
 
 if __name__ == '__main__':
-    app.run(debug=True)
     app.run(debug=True)
