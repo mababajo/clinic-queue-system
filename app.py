@@ -1,29 +1,40 @@
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, request, redirect
 
 app = Flask(__name__)
 
-# List to hold patients in the queue
+# List to hold patients
 queue = []
 
+# Homepage showing queue + add/remove options
 @app.route('/')
 def home():
-    # Simple homepage showing queue message
+    queue_list = "<br>".join([f"{i+1}. {name} <a href='/remove/{name}'>Remove</a>"
+                              for i, name in enumerate(queue)])
     return render_template_string("""
         <h1>Welcome to the Clinic Queue System</h1>
-        <p>Current queue: {{ queue_length }} patients</p>
-    """, queue_length=len(queue))
+        <h2>Current Queue:</h2>
+        <p>{{ queue_list|safe }}</p>
+        <h3>Add Patient:</h3>
+        <form action="/add_form" method="post">
+            <input type="text" name="patient_name" placeholder="Patient Name" required>
+            <input type="submit" value="Add">
+        </form>
+    """, queue_list=queue_list)
 
+# Add patient via URL
 @app.route('/add/<patient_name>')
 def add_patient(patient_name):
     queue.append(patient_name)
     return f"Patient {patient_name} added! Current queue length: {len(queue)}"
 
-@app.route('/queue')
-def view_queue():
-    if not queue:
-        return "The queue is currently empty."
-    return "<br>".join([f"{i+1}. {name}" for i, name in enumerate(queue)])
+# Add patient via form
+@app.route('/add_form', methods=['POST'])
+def add_form():
+    patient_name = request.form['patient_name']
+    queue.append(patient_name)
+    return redirect('/')
 
+# Remove patient
 @app.route('/remove/<patient_name>')
 def remove_patient(patient_name):
     if patient_name in queue:
@@ -31,5 +42,13 @@ def remove_patient(patient_name):
         return f"Patient {patient_name} removed! Current queue length: {len(queue)}"
     return f"Patient {patient_name} not found in the queue."
 
+# View full queue (optional, still works)
+@app.route('/queue')
+def view_queue():
+    if not queue:
+        return "The queue is currently empty."
+    return "<br>".join([f"{i+1}. {name}" for i, name in enumerate(queue)])
+
 if __name__ == '__main__':
+    app.run(debug=True)
     app.run(debug=True)
