@@ -93,34 +93,80 @@ def home():
     avg_wait_str = f"{average_wait():.2f}"
 
     return render_template_string("""
-        <h1>Clinic Queue System</h1>
-        <p>{{ message }}</p>
+        <html>
+        <head>
+            <title>Clinic Queue System</title>
+            <style>
+                body {
+                    background-color: #1c1c1e;
+                    color: #ffffff;
+                    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                    margin: 20px;
+                }
+                h1, h2, h3 {
+                    color: #f5f5f7;
+                }
+                input[type=text] {
+                    padding: 8px;
+                    border-radius: 5px;
+                    border: none;
+                    width: 200px;
+                }
+                button {
+                    padding: 8px 12px;
+                    margin: 5px;
+                    border: none;
+                    border-radius: 5px;
+                    background-color: #0a84ff;
+                    color: white;
+                    cursor: pointer;
+                }
+                button:hover {
+                    background-color: #0060df;
+                }
+                form {
+                    margin-bottom: 20px;
+                }
+                ul {
+                    list-style-type: none;
+                    padding-left: 0;
+                }
+                li {
+                    padding: 3px 0;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Clinic Queue System</h1>
+            <p>{{ message }}</p>
 
-        <form method="POST">
-            <input type="text" name="patient_name" placeholder="Patient Name">
-            <label>Priority <input type="checkbox" name="priority"></label>
-            <button name="action" value="add">Add Patient</button>
-            <button name="action" value="remove">Remove Patient</button>
-            <button name="action" value="next">Next Patient</button>
-            <button name="action" value="reset">Reset Queue</button>
-            <button name="action" value="export">Export Queue</button>
-            <button name="action" value="sort">Sort Queue</button>
-        </form>
+            <form method="POST">
+                <input type="text" name="patient_name" placeholder="Patient Name">
+                <label>Priority <input type="checkbox" name="priority"></label>
+                <button name="action" value="add">Add Patient</button>
+                <button name="action" value="remove">Remove Patient</button>
+                <button name="action" value="next">Next Patient</button>
+                <button name="action" value="reset">Reset Queue</button>
+                <button name="action" value="export">Export Queue</button>
+                <button name="action" value="sort">Sort Queue</button>
+            </form>
 
-        <h2>Queue:</h2>
-        <p>{{ queue_list }}</p>
+            <h2>Queue:</h2>
+            <p>{{ queue_list }}</p>
 
-        <h2>Total Served: {{ total_served }}</h2>
-        <h2>Next Patient: {{ next_patient_name }}</h2>
-        <h2>Average Waiting Time: {{ avg_wait_str }} minutes</h2>
-        <h2>Today's Served Count: {{ daily_count_val }}</h2>
+            <h2>Total Served: {{ total_served }}</h2>
+            <h2>Next Patient: {{ next_patient_name }}</h2>
+            <h2>Average Waiting Time: {{ avg_wait_str }} minutes</h2>
+            <h2>Today's Served Count: {{ daily_count_val }}</h2>
 
-        <h3>Served Patients History:</h3>
-        <ul>
-        {% for patient in served_list %}
-            <li>{{ patient.name }} - {{ patient.time }}</li>
-        {% endfor %}
-        </ul>
+            <h3>Served Patients History:</h3>
+            <ul>
+            {% for patient in served_list %}
+                <li>{{ patient.name }} - {{ patient.time }}</li>
+            {% endfor %}
+            </ul>
+        </body>
+        </html>
     """,
     queue_list=queue_list,
     total_served=total_served,
