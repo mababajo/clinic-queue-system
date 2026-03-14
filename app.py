@@ -1,21 +1,23 @@
 from flask import Flask, render_template_string, request, redirect, Response
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Lists to hold patients
-queue = []
-served_history = []
+# Lists to hold patients and their timestamps
+queue = []  # Each item: {"name": str, "time": str}
+served_history = []  # Each item: {"name": str, "time": str}
 
 # Counter for total patients served
 total_served = 0
 
-# Homepage showing queue + next patient + total served + add/remove/reset/search/sort/export/served history/priority
+# Homepage showing queue + next patient + total served + add/remove/reset/search/sort/export/served history/priority/timestamps
 @app.route('/')
 def home():
-    queue_list = "<br>".join([f"{i+1}. {name} <a href='/remove/{name}'>Remove</a>"
-                              for i, name in enumerate(queue)])
-    next_patient = queue[0] if queue else "No patients in queue"
-    served_list = "<br>".join(served_history) if served_history else "No patients served yet"
+    queue_list = "<br>".join([f"{i+1}. {p['name']} (added at {p['time']}) <a href='/remove/{p['name']}'>Remove</a>"
+                              for i, p in enumerate(queue)])
+    next_patient = f"{queue[0]['name']} (added at {queue[0]['time']})" if queue else "No patients in queue"
+    served_list = "<br>".join([f"{p['name']} (added at {p['time']})" for p in served_history]) if served_history else "No patients served yet"
+    
     return render_template_string("""
         <h1>Welcome to the Clinic Queue System</h1>
         <h2>Next Patient: {{ next_patient }}</h2>
@@ -64,32 +66,36 @@ def home():
 # Add patient via URL
 @app.route('/add/<patient_name>')
 def add_patient(patient_name):
-    queue.append(patient_name)
-    return f"Patient {patient_name} added! Current queue length: {len(queue)}"
+    now = datetime.now().strftime("%H:%M:%S %d-%m-%Y")
+    queue.append({"name": patient_name, "time": now})
+    return f"Patient {patient_name} added at {now}! Current queue length: {len(queue)}"
 
 # Add patient via form
 @app.route('/add_form', methods=['POST'])
 def add_form():
     patient_name = request.form['patient_name']
-    queue.append(patient_name)
+    now = datetime.now().strftime("%H:%M:%S %d-%m-%Y")
+    queue.append({"name": patient_name, "time": now})
     return redirect('/')
 
 # Add urgent patient to the front of the queue via form
 @app.route('/add_urgent_form', methods=['POST'])
 def add_urgent_form():
     patient_name = request.form['patient_name']
-    queue.insert(0, patient_name)
+    now = datetime.now().strftime("%H:%M:%S %d-%m-%Y")
+    queue.insert(0, {"name": patient_name, "time": now})
     return redirect('/')
 
 # Remove patient and mark as served
 @app.route('/remove/<patient_name>')
 def remove_patient(patient_name):
     global total_served, served_history
-    if patient_name in queue:
-        queue.remove(patient_name)
-        total_served += 1
-        served_history.append(patient_name)
-        return f"Patient {patient_name} removed and marked as served! Current queue length: {len(queue)}"
+    for p in queue:
+        if p['name'] == patient_name:
+            queue.remove(p)
+            total_served += 1
+            served_history.append(p)
+            return f"Patient {patient_name} removed and marked as served!"
     return f"Patient {patient_name} not found in the queue."
 
 # View full queue
@@ -97,7 +103,7 @@ def remove_patient(patient_name):
 def view_queue():
     if not queue:
         return "The queue is currently empty."
-    return "<br>".join([f"{i+1}. {name}" for i, name in enumerate(queue)])
+    return "<br>".join([f"{i+1}. {p['name']} (added at {p['time']})" for i, p in enumerate(queue)])
 
 # Reset the queue
 @app.route('/reset', methods=['POST'])
@@ -112,34 +118,36 @@ def reset_queue():
 @app.route('/search_form', methods=['POST'])
 def search_form():
     patient_name = request.form['patient_name']
-    if patient_name in queue:
-        position = queue.index(patient_name) + 1
-        return f"Patient {patient_name} is in the queue at position {position}."
+    for i, p in enumerate(queue):
+        if p['name'] == patient_name:
+            position = i + 1
+            return f"Patient {patient_name} is in the queue at position {position}, added at {p['time']}."
     return f"Patient {patient_name} is not in the queue."
 
-# Sort the queue alphabetically
+# Sort the queue alphabetically (based on name)
 @app.route('/sort', methods=['POST'])
 def sort_queue():
     global queue
-    queue.sort()
+    queue.sort(key=lambda x: x['name'])
     return redirect('/')
 
-# Export queue as a text report including served history
+# Export queue as a text report including timestamps and served history
 @app.route('/export')
 def export_queue():
     report = "Clinic Queue Report\n\n"
     report += "Total Patients Served: " + str(total_served) + "\n\n"
+    
     if queue:
         report += "Current Queue:\n"
-        for i, name in enumerate(queue, 1):
-            report += f"{i}. {name}\n"
+        for i, p in enumerate(queue, 1):
+            report += f"{i}. {p['name']} (added at {p['time']})\n"
     else:
         report += "The queue is currently empty.\n"
     
     if served_history:
         report += "\nServed Patients History:\n"
-        for i, name in enumerate(served_history, 1):
-            report += f"{i}. {name}\n"
+        for i, p in enumerate(served_history, 1):
+            report += f"{i}. {p['name']} (added at {p['time']})\n"
 
     return Response(
         report,
