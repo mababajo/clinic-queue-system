@@ -8,7 +8,7 @@ queue = []
 # Counter for total patients served
 total_served = 0
 
-# Homepage showing queue + next patient + total served + add/remove/reset/search
+# Homepage showing queue + next patient + total served + add/remove/reset/search/sort
 @app.route('/')
 def home():
     queue_list = "<br>".join([f"{i+1}. {name} <a href='/remove/{name}'>Remove</a>"
@@ -30,6 +30,11 @@ def home():
         <form action="/search_form" method="post">
             <input type="text" name="patient_name" placeholder="Patient Name" required>
             <input type="submit" value="Search">
+        </form>
+
+        <h3>Sort Queue:</h3>
+        <form action="/sort" method="post">
+            <input type="submit" value="Sort Alphabetically">
         </form>
 
         <h3>Total Patients Served: {{ total_served }}</h3>
@@ -86,6 +91,13 @@ def search_form():
         position = queue.index(patient_name) + 1
         return f"Patient {patient_name} is in the queue at position {position}."
     return f"Patient {patient_name} is not in the queue."
+
+# Sort the queue alphabetically
+@app.route('/sort', methods=['POST'])
+def sort_queue():
+    global queue
+    queue.sort()
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run(debug=True)
