@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, redirect
+from flask import Flask, render_template_string, request, redirect, Response
 
 app = Flask(__name__)
 
@@ -8,7 +8,7 @@ queue = []
 # Counter for total patients served
 total_served = 0
 
-# Homepage showing queue + next patient + total served + add/remove/reset/search/sort
+# Homepage showing queue + next patient + total served + add/remove/reset/search/sort/export
 @app.route('/')
 def home():
     queue_list = "<br>".join([f"{i+1}. {name} <a href='/remove/{name}'>Remove</a>"
@@ -35,6 +35,11 @@ def home():
         <h3>Sort Queue:</h3>
         <form action="/sort" method="post">
             <input type="submit" value="Sort Alphabetically">
+        </form>
+
+        <h3>Export Queue / Report:</h3>
+        <form action="/export" method="get">
+            <input type="submit" value="Download Report">
         </form>
 
         <h3>Total Patients Served: {{ total_served }}</h3>
@@ -98,6 +103,24 @@ def sort_queue():
     global queue
     queue.sort()
     return redirect('/')
+
+# Export queue as a text report
+@app.route('/export')
+def export_queue():
+    report = "Clinic Queue Report\n\n"
+    report += "Total Patients Served: " + str(total_served) + "\n\n"
+    if queue:
+        report += "Current Queue:\n"
+        for i, name in enumerate(queue, 1):
+            report += f"{i}. {name}\n"
+    else:
+        report += "The queue is currently empty.\n"
+    
+    return Response(
+        report,
+        mimetype="text/plain",
+        headers={"Content-Disposition": "attachment;filename=clinic_queue_report.txt"}
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)
