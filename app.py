@@ -100,7 +100,8 @@ def home():
                 body {
                     background-color: #1c1c1e;
                     color: #ffffff;
-                    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                    /* Push 19: refined Apple-style font */
+                    font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
                     margin: 20px;
                 }
                 h1, h2, h3 {
@@ -120,6 +121,7 @@ def home():
                     background-color: #0a84ff;
                     color: white;
                     cursor: pointer;
+                    font-family: inherit;
                 }
                 button:hover {
                     background-color: #0060df;
