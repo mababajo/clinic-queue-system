@@ -172,20 +172,19 @@ def reset_queue():
 # -----------------------------
 @app.route("/export")
 def export():
-    output = io.StringIO()
-    writer = csv.writer(output)
+    csv_data = "Patient Name,Time Added\n"
 
-    writer.writerow(["Patient Name", "Time Added"])
-
+    # Check if each item is a Patient object or just a string
     for patient in queue:
-        writer.writerow([patient.name, patient.time_added])
-
-    output.seek(0)
+        if isinstance(patient, Patient):
+            csv_data += f"{patient.name},{patient.time_added}\n"
+        else:  # fallback if queue stores strings
+            csv_data += f"{patient},N/A\n"
 
     return Response(
-        output,
+        csv_data,
         mimetype="text/csv",
-        headers={"Content-Disposition": "attachment;filename=queue.csv"}
+        headers={"Content-Disposition": "attachment; filename=queue.csv"}
     )
 
 
