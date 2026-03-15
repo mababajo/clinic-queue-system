@@ -35,6 +35,11 @@ def home():
     <html>
     <head>
         <title>Clinic Queue System</title>
+
+        <div class="developer-mark">
+        <p class="dev-name">mababajo</p>
+        </div>
+        
         <style>
             body {
                 background-color: #111;
@@ -66,6 +71,28 @@ def home():
             ul {
                 list-style: none;
                 padding: 0;
+            }
+
+            .developer-mark {
+            position: fixed;
+            bottom: 12px;
+            right: 18px;
+            text-align: right;
+            opacity: 0.35;
+            font-size: 11px;
+            color: #9ca3af;
+            font-family: monospace;
+            }
+            
+            .dev-name {
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            }
+            
+            .developer-mark:hover {
+            opacity: 0.8;
+            transform: translateY(-4px);
             }
         </style>
     </head>
