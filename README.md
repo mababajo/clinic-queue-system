@@ -1,3 +1,9 @@
+COS 202 Assignment 4: Clinic Queue System
+
+Student Name: Muhammad Ahmad Babajo
+Matric Number: (MAAUN/24/SWE/0031)
+
+
 Clinic Queue System
 
 This is a web-based app built using Python and Flask to manage patients in a health clinic. Users can add patients, view the queue, mark patients as served, and see daily counts. It uses a queue (FIFO) to track the order of patients and timestamps for when patients are added or served.
